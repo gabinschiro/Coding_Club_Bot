@@ -1,5 +1,5 @@
-import { readdirSync } from "fs";
 import { Client } from "discord.js";
+import { readdirSync } from "fs";
 
 export function getEvents() {
   const events = readdirSync("./src/event/events");
