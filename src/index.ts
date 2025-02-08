@@ -3,9 +3,8 @@ import { config } from "dotenv";
 import { handleEvents } from "./event/event_handler";
 import { ExtendedClient } from "./interface/extended_client";
 
-const client = new Client({ intents: 32767 });
-
-const extendedClient = client as ExtendedClient;
+const client: Client = new Client({ intents: 32767 });
+const extendedClient: ExtendedClient = client as ExtendedClient;
 
 extendedClient.commands = new Collection();
 

@@ -1,7 +1,7 @@
-import { Client, Events } from "discord.js";
+import { Client } from "discord.js";
 
-module.exports = (client: Client) => {
-  client.once(Events.ClientReady, () => {
+module.exports = (client: Client): void => {
+  client.once("ready", () => {
     console.log(`Logged in as ${client.user?.tag}`);
   });
 };

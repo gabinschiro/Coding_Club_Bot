@@ -1,19 +1,19 @@
 import { Client } from "discord.js";
 import { readdirSync } from "fs";
 
-function getEvents() {
-  const events = readdirSync("./src/event/events");
+function getEvents(): string[] {
+  const events: string[] = readdirSync("./src/event/events");
   return events;
 }
 
-function handleEvent(event: string, client: Client) {
-  const eventHandler = require(`./events/${event}`);
+function handleEvent(event: string, client: Client): void {
+  const eventHandler: any = require(`./events/${event}`);
   eventHandler(client);
 }
 
-export function handleEvents(client: Client) {
-  const events = getEvents();
-  events.forEach((event) => {
+export function handleEvents(client: Client): void {
+  const events: string[] = getEvents();
+  events.forEach((event: string) => {
     handleEvent(event, client);
   });
 }
