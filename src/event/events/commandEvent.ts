@@ -1,5 +1,5 @@
 import { Events } from "discord.js";
-import { ExtendedClient } from "../../interface/extended_client";
+import { ExtendedClient } from "../../interface/extendedClient";
 
 module.exports = (client: ExtendedClient): void => {
   client.on(Events.InteractionCreate, async (interaction) => {
