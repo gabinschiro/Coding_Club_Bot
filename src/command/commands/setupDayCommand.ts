@@ -52,18 +52,22 @@ export const execute = async (interaction: CommandInteraction): Promise<void> =>
     color: '#E91E63',
   });
 
-  const lowestRolePosition = interaction.guild.roles.cache.reduce((lowest, role) => {
-    return role.position < lowest ? role.position : lowest;
-  }, Infinity);
+  const allRoles = await interaction.guild.roles.fetch();
+  const lowestEncadrantRole = allRoles
+    .filter(role => role.name.startsWith('Encadrant'))
+    .sort((a, b) => a.position - b.position)
+    .first();
 
-  try {
-    await participantRole.setPosition(lowestRolePosition - 1);
-    await encadrantRole.setPosition(participantRole.position + 1);
-  } catch (error) {
-    console.error("Erreur lors de la modification de la position des rôles :", error);
-    await interaction.followUp("Erreur : Impossible de modifier la position des rôles.");
-    return;
-  }
+  await interaction.guild.roles.setPositions([
+    {
+      role: participantRole.id,
+      position: 0,
+    },
+    {
+      role: encadrantRole.id,
+      position: lowestEncadrantRole ? lowestEncadrantRole.position + 1 : 1,
+    },
+  ]);
 
   const category = await interaction.guild.channels.create({
     name: categoryName,
@@ -93,7 +97,7 @@ export const execute = async (interaction: CommandInteraction): Promise<void> =>
   }
 
   const channels = [
-    { name: "encadrants", permissions: { encadrant: true, participant: false } },
+    { name: "encadrants", permissions: { encadrant: true, participant: false, everyone: false, write: false } },
     { name: "annonces", permissions: { encadrant: true, participant: true, everyone: false, write: false } },
     { name: "general", permissions: { encadrant: true, participant: true } },
     { name: "sujet-ressources", permissions: { encadrant: true, participant: true, everyone: false, write: false } },
@@ -109,12 +113,12 @@ export const execute = async (interaction: CommandInteraction): Promise<void> =>
       permissionOverwrites: [
         {
           id: interaction.guild.roles.everyone.id,
-          deny: channel.permissions.everyone ? [] : [PermissionsBitField.Flags.ViewChannel],
+          deny: channel.name === "encadrants" ? [PermissionsBitField.Flags.ViewChannel] : (channel.permissions.everyone ? [] : [PermissionsBitField.Flags.ViewChannel]),
           type: OverwriteType.Role,
         },
         {
           id: participantRole.id,
-          allow: [PermissionsBitField.Flags.ViewChannel],
+          allow: channel.name === "encadrants" ? [] : [PermissionsBitField.Flags.ViewChannel],
           deny: channel.permissions.write === false ? [PermissionsBitField.Flags.SendMessages] : [],
           type: OverwriteType.Role,
         },
