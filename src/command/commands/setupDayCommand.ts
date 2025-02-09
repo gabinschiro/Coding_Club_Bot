@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, PermissionsBitField, CommandInteractionOptionResolver, ChannelType, OverwriteType } from "discord.js";
+import { CommandInteraction, PermissionsBitField, CommandInteractionOptionResolver, ChannelType, OverwriteType, MessageFlags } from "discord.js";
 
 export const data = new SlashCommandBuilder()
   .setName("setupday")
@@ -13,7 +13,7 @@ export const data = new SlashCommandBuilder()
   );
 
 export const execute = async (interaction: CommandInteraction): Promise<void> => {
-  await interaction.deferReply();
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
   const options = interaction.options as CommandInteractionOptionResolver;
   const date: string = options.getString("date") as string;
@@ -21,14 +21,14 @@ export const execute = async (interaction: CommandInteraction): Promise<void> =>
 
   const dateRegex = /^\d{2}\/\d{2}\/\d{2}$/;
   if (!dateRegex.test(date)) {
-    await interaction.followUp("Erreur : Le format de la date doit être JJ/MM/AA.");
+    await interaction.reply({ content: "Erreur : Le format de la date doit être JJ/MM/AA.", flags: MessageFlags.Ephemeral });
     return;
   }
 
   const categoryName = `${theme} ${date}`;
 
   if (!interaction.guild) {
-    await interaction.reply("Erreur : Impossible de trouver le serveur.");
+    await interaction.reply({ content: "Erreur : Impossible de trouver le serveur.", flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -36,7 +36,7 @@ export const execute = async (interaction: CommandInteraction): Promise<void> =>
   const botPermissions = botMember.permissions;
 
   if (!botPermissions.has(PermissionsBitField.Flags.ManageRoles) || !botPermissions.has(PermissionsBitField.Flags.ManageChannels)) {
-    await interaction.reply("Erreur : Le bot n'a pas les permissions nécessaires pour gérer les rôles et les canaux.");
+    await interaction.reply({ content: "Erreur : Le bot n'a pas les permissions nécessaires pour gérer les rôles et les canaux.", flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -92,7 +92,7 @@ export const execute = async (interaction: CommandInteraction): Promise<void> =>
   });
 
   if (!category) {
-    await interaction.reply("Échec de la création de la catégorie.");
+    await interaction.reply({ content: "Échec de la création de la catégorie.", flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -131,7 +131,7 @@ export const execute = async (interaction: CommandInteraction): Promise<void> =>
     });
   }
 
-  await interaction.followUp(`Setup terminé pour la journée : ${categoryName}`);
+  await interaction.followUp({ content: `Setup terminé pour la journée : ${categoryName}`, flags: MessageFlags.Ephemeral });
 };
 
 module.exports = { data, execute };
