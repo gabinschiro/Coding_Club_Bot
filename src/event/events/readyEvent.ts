@@ -8,13 +8,10 @@ module.exports = (client: ExtendedClient): void => {
     const rest = new REST({ version: "9" }).setToken(process.env.TOKEN as string);
 
     try {
-      console.log("Started refreshing application (/) commands for a specific guild.");
-
       await rest.put(
         Routes.applicationGuildCommands(client.user?.id as string, process.env.GUILD_ID as string),
         { body: client.commandArray }
       );
-      console.log("Successfully reloaded application (/) commands for the specified guild.");
     } catch (error) {
       console.error(error);
     }
